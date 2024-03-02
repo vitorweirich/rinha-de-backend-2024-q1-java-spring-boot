@@ -15,11 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -32,39 +29,6 @@ public class TransactionsControllers {
 	
 	private final JdbcTemplate jdbcTemplate;
 
-//	@PostMapping("/clientes/{id}/transacoes")
-//	@Transactional()
-//	public ResponseEntity<Object> createTransaction(@PathVariable Integer id, @RequestBody TransactionEntity body) {
-//		Optional<ClientEntity> findById = clientRepository.findById(id);
-//		if(findById.isEmpty()) {
-//			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//		}
-//		
-//		final ClientEntity client = findById.get();
-//		long balance = client.getBalance();
-//		long limit = client.getLimite();
-//		
-//		if(TransactionType.c.equals(body.getType())) {
-//			balance += body.getAmount();
-//		} else {			
-//			balance -= body.getAmount();
-//			if((balance + limit) < 0) {
-//				return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-//			}
-//		}
-//		
-//		body.setClient(client);
-//		client.setBalance(balance);
-//		
-//		CompletableFuture<ClientEntity> saveClientAsync = CompletableFuture.supplyAsync(() -> clientRepository.save(client));
-//		CompletableFuture<TransactionEntity> saveTransactionAsync = CompletableFuture.supplyAsync(() -> transactionRepository.save(body));
-//		
-//		saveClientAsync.join();
-//		saveTransactionAsync.join();
-//		
-//		return ResponseEntity.ok(Map.of("limite", limit, "saldo", balance));
-//	}
-	
 	@PostMapping("/clientes/{id}/transacoes")
     @Transactional
     public ResponseEntity<Object> createTransactionV2(@PathVariable Integer id, @RequestBody TransactionEntity body) {
@@ -79,26 +43,6 @@ public class TransactionsControllers {
         return ResponseEntity.ok(Map.of("limite", executed.get("limit_val"), "saldo", executed.get("current_balance")));
     }
 	
-	@Data
-	static class Balance {
-		private long total;
-		
-		@JsonProperty("data_extrato")
-		private ZonedDateTime statementTime = ZonedDateTime.now();
-		
-		@JsonProperty("limite")
-		private long limit;
-	}
-	
-	@Data
-	static class TransactionDTO {
-		@JsonProperty("saldo")
-		private Balance balance;
-		
-		@JsonProperty("ultimas_transacoes")
-		private List<TransactionEntity> lastTransactions;
-	}
-	
 	@GetMapping("/clientes/{id}/extrato")
 	public ResponseEntity<Object> getTransaction(@PathVariable Integer id) {
 		CompletableFuture<Optional<ClientEntity>> saveClientAsync = CompletableFuture.supplyAsync(() -> clientRepository.findById(id));
@@ -111,18 +55,10 @@ public class TransactionsControllers {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
 		}
 		
-		List<TransactionEntity> find = saveTransactionAsync.join();
-		
 		ClientEntity client = join.get();
 		
-		TransactionDTO response = new TransactionDTO();
-		response.setLastTransactions(find);
-		Balance balance = new Balance();
-		balance.setTotal(client.getBalance());
-		balance.setLimit(client.getLimite());
-		
-		response.setBalance(balance);
-		
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(
+				Map.of("saldo", Map.of("data_extrato", ZonedDateTime.now(), "limit", client.getLimite(), "total", client.getBalance()),
+				"ultimas_transacoes", saveTransactionAsync.join().stream().map(t -> Map.of("valor", t.getAmount(), "tipe", t.getType(), "descricao", t.getDescription(), "realizada_em", t.getCreatedAt())).toList()));
 	}
 }

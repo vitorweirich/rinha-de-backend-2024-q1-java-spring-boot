@@ -1,17 +1,10 @@
-FROM openjdk:17-jdk-slim as BUILD
-
+FROM ghcr.io/graalvm/native-image-community:21 as build
 WORKDIR /app
+COPY . /app
+RUN ./mvnw -Pnative native:compile
 
-COPY src /app/src
-COPY pom.xml /app
-COPY .mvn /app/.mvn
-COPY mvnw /app/mvnw
-
-RUN ./mvnw clean package -DskipTests
-
-FROM openjdk:17-jdk-slim as RUNTIME
-COPY --from=BUILD /app/target/com.github-0.0.1-SNAPSHOT.jar /rinha.jar
-
+FROM alpine
+COPY --from=build /app/target/rinha2024q1 /backend
+RUN apk add libc6-compat
 EXPOSE 8080
-
-ENTRYPOINT [ "java", "-XX:+UseParallelGC", "-XX:MaxRAMPercentage=75", "-jar", "./rinha.jar" ]
+CMD ["./backend"]

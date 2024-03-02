@@ -1,8 +1,11 @@
 version: "3"
 ## run command: docker-compose --compatibility --file docker-compose-stress-test.yml up --force-recreate --buid
 services:
-  app1: &app
-    image: docker.io/weirichvitor/java-rinha-2024-q1:latest
+  app1:
+    &app # image: docker.io/weirichvitor/java-rinha-2024-q1:latest -> versão normal sem Native Image
+    image: docker.io/weirichvitor/java-rinha-2024-q1-graalvm:latest
+    # build:
+    #   context: .
     hostname: app1
     expose:
       - "8080"
@@ -31,6 +34,8 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - 5432:5432
     healthcheck:

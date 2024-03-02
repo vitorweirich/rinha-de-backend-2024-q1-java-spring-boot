@@ -5,16 +5,16 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.2</version>
+		<version>3.2.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.github.vitor.rinha2024q1</groupId>
-	<artifactId>com.github</artifactId>
+	<artifactId>rinha2024q1</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>vitor</name>
+	<name>rinha2024q1</name>
 	<description>Rinha Back-End Q1</description>
 	<properties>
-		<java.version>17</java.version>
+		<java.version>21</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -50,6 +50,25 @@
 
 	<build>
 		<plugins>
+			<plugin>
+		        <groupId>org.hibernate.orm.tooling</groupId>
+		        <artifactId>hibernate-enhance-maven-plugin</artifactId>
+		        <executions>
+		            <execution>
+		                <configuration>
+		                    <failOnError>true</failOnError>
+		                    <enableLazyInitialization>true</enableLazyInitialization>
+		                </configuration>
+		                <goals>
+		                    <goal>enhance</goal>
+		                </goals>
+		            </execution>
+		        </executions>
+		    </plugin>
+			<plugin>
+                <groupId>org.graalvm.buildtools</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+            </plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
