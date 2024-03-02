@@ -18,7 +18,10 @@ target/
 *.iws
 *.iml
 *.ipr
-
+/node_modules
+*.js
+yarn.lock
+package.json
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
