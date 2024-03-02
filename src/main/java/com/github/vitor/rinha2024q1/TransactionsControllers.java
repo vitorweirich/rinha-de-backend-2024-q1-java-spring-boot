@@ -59,6 +59,6 @@ public class TransactionsControllers {
 		
 		return ResponseEntity.ok(
 				Map.of("saldo", Map.of("data_extrato", ZonedDateTime.now(), "limite", client.getLimite(), "total", client.getBalance()),
-				"ultimas_transacoes", saveTransactionAsync.join().stream().map(t -> Map.of("valor", t.getAmount(), "tipe", t.getType(), "descricao", t.getDescription(), "realizada_em", t.getCreatedAt())).toList()));
+				"ultimas_transacoes", saveTransactionAsync.join().stream().map(t -> Map.of("valor", t.getAmount(), "tipo", t.getType(), "descricao", t.getDescription(), "realizada_em", t.getCreatedAt())).toList()));
 	}
 }

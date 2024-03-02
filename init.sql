@@ -20,11 +20,11 @@ create index idx_client_id ON transaction_entity (client_id);
 alter table if exists transaction_entity 
     add constraint FKoykvsm64e0mpn8jslx3jsi5bt foreign key (client_id) references client_entity;
 
-insert into client_entity values (1, 0, -100000);
-insert into client_entity values (2, 0, -80000);
-insert into client_entity values (3, 0, -1000000);
-insert into client_entity values (4, 0, -10000000);
-insert into client_entity values (5, 0, -500000);
+insert into client_entity values (1, 0, 100000);
+insert into client_entity values (2, 0, 80000);
+insert into client_entity values (3, 0, 1000000);
+insert into client_entity values (4, 0, 10000000);
+insert into client_entity values (5, 0, 500000);
 
 
 CREATE OR REPLACE FUNCTION create_transaction(client_id_arg INTEGER, amount_arg BIGINT, type_arg SMALLINT, description_arg VARCHAR)
@@ -53,7 +53,7 @@ BEGIN
         -- Verificar se há saldo suficiente para transações do tipo débito
         IF type_arg = 0 THEN
             current_balance := current_balance - amount_arg;
-            IF current_balance < limit_val THEN
+            IF current_balance < (limit_val * -1) THEN
                 RAISE EXCEPTION SQLSTATE '90422' USING MESSAGE = 'Saldo insuficiente para esta transação';
             END IF;
         ELSE
