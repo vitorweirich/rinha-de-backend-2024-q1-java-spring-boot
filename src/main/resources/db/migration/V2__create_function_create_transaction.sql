@@ -14,19 +14,29 @@ BEGIN
             RAISE EXCEPTION SQLSTATE '90404' USING MESSAGE = 'Cliente não encontrado';
         END IF;
 
+        -- -- Verificar se há saldo suficiente para transações do tipo débito
+        -- IF type_arg = 0 THEN
+        --     IF (current_balance + limit_val) < amount_arg THEN
+        --         RAISE EXCEPTION SQLSTATE '90422' USING MESSAGE = 'Saldo insuficiente para esta transação';
+        --     END IF;
+        -- END IF;
+
         -- Verificar se há saldo suficiente para transações do tipo débito
         IF type_arg = 0 THEN
-            IF (current_balance + limit_val) < amount_arg THEN
-                RAISE EXCEPTION SQLSTATE '90422' USING MESSAGE = 'Saldo insuficiente para esta transação, meu pau na tua mão';
-            END IF;
-        END IF;
-
-        -- Atualizar o saldo do cliente
-        IF type_arg = 0 THEN
             current_balance := current_balance - amount_arg;
+            IF current_balance < limit_val THEN
+                RAISE EXCEPTION SQLSTATE '90422' USING MESSAGE = 'Saldo insuficiente para esta transação';
+            END IF;
         ELSE
             current_balance := current_balance + amount_arg;
         END IF;
+
+        -- -- Atualizar o saldo do cliente
+        -- IF type_arg = 0 THEN
+        --     current_balance := current_balance - amount_arg;
+        -- ELSE
+        --     current_balance := current_balance + amount_arg;
+        -- END IF;
 
         UPDATE client_entity SET balance = current_balance WHERE id = client_id_arg;
 

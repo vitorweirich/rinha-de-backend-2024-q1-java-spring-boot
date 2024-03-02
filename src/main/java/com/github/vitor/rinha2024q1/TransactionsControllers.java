@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -67,6 +68,9 @@ public class TransactionsControllers {
 	@PostMapping("/clientes/{id}/transacoes")
     @Transactional
     public ResponseEntity<Object> createTransactionV2(@PathVariable Integer id, @RequestBody TransactionEntity body) {
+		if(body.getAmount() < 1 || StringUtils.isEmpty(body.getDescription()) || body.getDescription().length() > 10) {
+			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
+		}
         String sql = "SELECT limit_val, current_balance from create_transaction(?, ?, ?, ?)";
         Object[] params = { id, body.getAmount(), body.getType().ordinal(), body.getDescription() };
         int[] argsType = { java.sql.Types.INTEGER, java.sql.Types.BIGINT, java.sql.Types.SMALLINT, java.sql.Types.VARCHAR };

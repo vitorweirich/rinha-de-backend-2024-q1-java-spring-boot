@@ -1,5 +1,5 @@
 version: "3"
-## run command: docker-compose --compatibility --file docker-compose-stress-test.yml up --buid
+## run command: docker-compose --compatibility --file docker-compose-stress-test.yml up --force-recreate --buid
 services:
   app1: &app
     build: .
@@ -42,7 +42,7 @@ services:
       resources:
         limits:
           cpus: "1.14"
-          memory: "128MB"
+          memory: "156MB"
 
   nginx: # Load Balancer
     image: nginx:latest

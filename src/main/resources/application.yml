@@ -5,8 +5,6 @@ server:
     min-response-size: 1024
 
 spring:
-  main:
-    lazy-initialization: false
   datasource:
     driverClassName: org.postgresql.Driver
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres}
