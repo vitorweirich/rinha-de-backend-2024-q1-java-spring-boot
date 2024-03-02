@@ -2,7 +2,7 @@ version: "3"
 ## run command: docker-compose --compatibility --file docker-compose-stress-test.yml up --force-recreate --buid
 services:
   app1: &app
-    image: docker.io/vitor/java-rinha-2024-21:latest
+    image: docker.io/weirichvitor/java-rinha-2024-q1:latest
     hostname: app1
     expose:
       - "8080"
